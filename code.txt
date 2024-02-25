@@ -1,0 +1,61 @@
+// Pin definitions
+const int switch1Pin = 2;  // Pin for switch 1
+const int switch2Pin = 3;  // Pin for switch 2
+const int motorPin1 = 9;   // Pin for motor direction 1
+const int motorPin2 = 10;   // Pin for motor direction 2
+
+// Motor states
+#define FORWARD 0
+#define REVERSE 1
+#define STOPPED 2
+
+// Variables to hold switch state
+volatile bool switch1State = LOW;
+volatile bool switch2State = LOW;
+
+// Variable to hold current motor state
+volatile int motorState = STOPPED;
+
+void setup() {
+  // Initialize serial communication
+  Serial.begin(9600);
+  
+  // Set pins mode
+  pinMode(switch1Pin, INPUT_PULLUP);
+  pinMode(switch2Pin, INPUT_PULLUP);
+  pinMode(motorPin1, OUTPUT);
+  pinMode(motorPin2, OUTPUT);
+  
+  // Attach interrupts
+  attachInterrupt(digitalPinToInterrupt(switch1Pin), switch1ISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(switch2Pin), switch2ISR, CHANGE);
+}
+
+void loop() {
+  // Main code goes here
+  // For this example, we're not doing anything in the loop
+}
+
+// Interrupt service routine for switch 1
+void switch1ISR() {
+  switch1State = digitalRead(switch1Pin);
+  if (switch1State == HIGH) {
+    // Move motor forward
+    digitalWrite(motorPin1, HIGH);
+    digitalWrite(motorPin2, LOW);
+    motorState = FORWARD;
+    Serial.println("Motor moving forward");
+  }
+}
+
+// Interrupt service routine for switch 2
+void switch2ISR() {
+  switch2State = digitalRead(switch2Pin);
+  if (switch2State == HIGH) {
+    // Move motor reverse
+    digitalWrite(motorPin1, LOW);
+    digitalWrite(motorPin2, HIGH);
+    motorState = REVERSE;
+    Serial.println("Motor moving in reverse");
+  }
+}
